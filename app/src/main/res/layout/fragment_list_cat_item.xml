@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@style/AppTheme"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/catId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Gatinho">
+
+    </com.google.android.material.textview.MaterialTextView>
+
+    <ImageView
+        android:id="@+id/imageCat"
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="center"
+        tools:src="@tools:sample/avatars">
+
+    </ImageView>
+
+</LinearLayout>
