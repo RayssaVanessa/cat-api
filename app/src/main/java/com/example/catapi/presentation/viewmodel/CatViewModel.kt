@@ -59,4 +59,3 @@ internal class CatViewModel(
         _state.value = _state.value?.copy(isLoading = false)
     }
 }
-//externalizar a função do glide pra uma extensions fun
