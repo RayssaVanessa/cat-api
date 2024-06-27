@@ -32,7 +32,6 @@ class CatApiFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         viewModel.handleAction(CatAction.LoadData)
-        viewModel.handleAction(CatAction.onClickedItem)
     }
 
     private fun setupRecyclerView() {
@@ -41,24 +40,21 @@ class CatApiFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        lifecycleScope.launch {
-            viewModel.state.observe(viewLifecycleOwner) { state  ->
-                state.isError?.let {
-                    //handle error
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            if (state.isError != null) {
+                Toast.makeText(context, " ${state.isError}", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+            }
 
-                }
-                state.isLoading?.let {
-                    //handle loading
-                }
-                state.catList?.let {
-                    adapter.submitList(it)
-                }
-                state.messageState?.let {
-                    //handle message
-                    Toast.makeText(context, "Carregado", Toast.LENGTH_SHORT).show()
-                }
-//                adapter.submitList()
-           }
+            if (state.isLoading == true) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.GONE
+            }
+
+            if (state.catList != null) {
+                adapter.submitList(state.catList)
+            }
         }
     }
 }

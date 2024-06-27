@@ -4,7 +4,7 @@ import com.example.catapi.domain.model.CatListModel
 
  data class CatState(
     val isLoading: Boolean? = false,
-    val isError: String? = "",
+    val isError: String? = null,
     val catList: List<CatListModel>? = emptyList(),
     val messageState: String? = ""
 )
