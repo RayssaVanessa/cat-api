@@ -11,10 +11,7 @@ import io.mockk.mockk
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
@@ -30,46 +27,42 @@ internal class CatViewModelTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    private val testScheduler = TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(testScheduler)
-    private val testScope = TestScope(testDispatcher)
     private  lateinit var catApiViewModel: CatViewModel
 
     @MockK
     private val catUseCaseMock: CatUseCase = mockk()
+    val dispatchers = Dispatchers.Unconfined
 
     @Before
       fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        Dispatchers.setMain(testDispatcher)
-        catApiViewModel = CatViewModel(catUseCaseMock)
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+        catApiViewModel = CatViewModel(catUseCaseMock, dispatchers)
     }
 
     @Test
-    fun `when call loadData should handle IOException`() = testScope.runTest {
+    fun `when call loadData should handle IOException`() {
         // Given
         val exception = IOException("Network Error")
-        coEvery { catUseCaseMock.getCats() } throws exception //lança excessao toda vez  q chamar o usecase
+        coEvery { catUseCaseMock.getCats() } throws exception
 
         // When
         catApiViewModel.loadData()
-        testScheduler.advanceUntilIdle()
 
         // Then
-        coVerify { catUseCaseMock.getCats() } //verifica se foi chamado
+        coVerify { catUseCaseMock.getCats() }
         assert(catApiViewModel.state.value?.isLoading == false)
         assert(catApiViewModel.state.value?.isError == "Network Error")
     }
 
     @Test
-    fun `when the load data call is successful`() =  testScope.runTest {
+    fun `when the load data call is successful`() {
         // Given
         val catList = listOf(CatListModel("cat1", "url1"))
         coEvery { catUseCaseMock.getCats() }  returns flowOf(catList)
 
         // When
         catApiViewModel.loadData()
-        testScheduler.advanceUntilIdle()
 
         // Then
         coVerify { catUseCaseMock.getCats() }

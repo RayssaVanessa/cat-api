@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapi.data.api.ClientErrorException
-import com.example.catapi.data.api.ClientErrorInterceptor
 import com.example.catapi.data.api.NoConnectivityException
 import com.example.catapi.data.api.ServerException
 import com.example.catapi.domain.model.CatListModel
@@ -13,22 +12,19 @@ import com.example.catapi.domain.CatUseCase
 import com.example.catapi.presentation.viewmodel.action.CatAction
 import com.example.catapi.presentation.viewmodel.state.CatState
 import java.io.IOException
-import java.lang.RuntimeException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import retrofit2.Response
 
 internal class CatViewModel(
-    private val catUseCase: CatUseCase
+    private val catUseCase: CatUseCase,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
-    private val _listCat: MutableLiveData<List<CatListModel>> by lazy {
-        MutableLiveData<List<CatListModel>>()
-    }
 
     private val _state = MutableLiveData<CatState>()
     val state: LiveData<CatState> get() = _state
 
-    val listCat: LiveData<List<CatListModel>> = _listCat
 
     init {
         _state.value = CatState()
@@ -72,17 +68,17 @@ internal class CatViewModel(
     }
 
     private fun setStateError(message: String) {
-        _state.value = _state.value?.copy(
+        _state.postValue(_state.value?.copy(
             isError = message,
             isLoading = false
-        )
+        ))
     }
 
     private fun startLoading() {
-        _state.value = _state.value?.copy(isLoading = true)
+        _state.postValue(_state.value?.copy(isLoading = true))
     }
 
     private fun finishLoading() {
-        _state.value = _state.value?.copy(isLoading = false)
+        _state.postValue(_state.value?.copy(isLoading = false))
     }
 }
